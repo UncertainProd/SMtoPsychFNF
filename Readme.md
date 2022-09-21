@@ -10,11 +10,13 @@ The program allows pretty much any chart in any *.sm file to be converted into P
 
 Made in Python 3.10.6 but should work with versions as old as 3.6 (although I haven't tested that yet)
 
-To run the script in interactive mode just type ```bash
+To run the script in interactive mode just type 
+```bash
 python SMtoPsychFNF.py
 ```
 
-This script also supports taking inputs from configuration-json files. Just use the following command ```bash
+This script also supports taking inputs from configuration-json files. Just use the following command 
+```bash
 python SMtoPsychFNF.py --useconfig "path/to/config.json"
 ```
 
