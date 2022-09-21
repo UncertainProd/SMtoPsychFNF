@@ -1,0 +1,6 @@
+noinclude/
+*.sm
+*.json
+*.ogg
+__pycache__
+*.log
