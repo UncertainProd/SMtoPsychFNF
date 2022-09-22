@@ -20,4 +20,18 @@ This script also supports taking inputs from configuration-json files. Just use 
 python SMtoPsychFNF.py --useconfig "path/to/config.json"
 ```
 
+Config files must be in json format like so:
+```json
+{
+    "sm_path": "path/to/simfile.sm",
+    "chart_index": chart-number-you-want-to-convert-starting-at-1,
+    "songname": "Name of the song",
+    "songspeed": song-speed,
+    "p1": "player 1 name",
+    "p2": "player 2 name",
+    "gfVersion": "gf-version",
+    "flipsides": "y/n"
+}
+```
+
 **Warning** : This program will generate charts for any game mode (dance-single, dance-double, pump-single etc) although for Stepmania game modes that do not have 4 or 8 keys, the resulting json chart may not work as intended, so best stick to dance-single (only bf/opponent gets notes) or dance-double (for both bf and the opponent) charts alone. Currently does not support negBPM charts (They seem to get de-synced) but can handle bpm changes
