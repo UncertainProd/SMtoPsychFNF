@@ -53,14 +53,29 @@ def bpm_from_map(bpmmap:list[tuple[float]], beatn:float):
             return bpmmap[i-1][1]
     return bpmmap[-1][1]
 
-def make_swagsection(bpm:float, changebpm:bool):
+def make_swagsection(bpm:float, changebpm:bool, bfsection:bool=False):
     return {
         "sectionNotes": [], # list[list[float(strumtime), int(note), float(hold duration)]]
         "sectionBeats": 4,
         "typeOfSection": 0,
-        "mustHitSection": True, # should be set in the engine
+        "mustHitSection": bfsection,
         "gfSection": False,
         "bpm": bpm,
         "changeBPM": changebpm,
         "lengthInSteps": 16
     }
+
+def clean_chart(chartstr):
+    # removing comments (anything between a '//' and a newline)
+    newchartstr = ''
+    valid = True
+    for i, ch in enumerate(chartstr):
+        if ch == '/' and (i+1 < len(chartstr) and chartstr[i+1] == '/'):
+            valid = False
+        elif ch == '\n':
+            newchartstr += ch
+            valid = True
+        else:
+            if valid:
+                newchartstr += ch
+    return newchartstr

@@ -1,6 +1,6 @@
 # SM to Psych-engine JSON converter
 
-## This is a python script which convert Stepmania/Etterna Charts (*.sm) into FNF JSON files, which are compatible with the Psych-engine (as of v0.6.2)
+### This is a python script which converts Stepmania/Etterna Charts (*.sm files) into FNF JSON files, which are compatible with the Psych-engine (as of v0.6.2)
 
 #### Note: Does not support *.ssc files or json to sm conversion just yet
 
@@ -20,4 +20,4 @@ This script also supports taking inputs from configuration-json files. Just use 
 python SMtoPsychFNF.py --useconfig "path/to/config.json"
 ```
 
-**Warning** : This program will generate charts for any game mode (dance-single, dance-double, pump-single etc) although for Stepmania game modes that do not have 4 or 8 keys, the resulting json chart may not work as intended, so best stick to dance-single (only bf gets notes) or dance-double (for both bf and the opponent) charts alone. Currently does not support negBPM charts but can handle bpm changes
+**Warning** : This program will generate charts for any game mode (dance-single, dance-double, pump-single etc) although for Stepmania game modes that do not have 4 or 8 keys, the resulting json chart may not work as intended, so best stick to dance-single (only bf/opponent gets notes) or dance-double (for both bf and the opponent) charts alone. Currently does not support negBPM charts (They seem to get de-synced) but can handle bpm changes

@@ -61,10 +61,12 @@ def main():
         nkeys = simfile.charts[chart_index].n_keys
 
         songname = cfg.get('songname', simfile.header_tags.get('TITLE', 'Simfile-song'))
-        songspeed = int(cfg.get('songspeed', 1))
+        songspeed = float(cfg.get('songspeed', 1))
         p1 = cfg.get('p1', 'bf')
         p2 = cfg.get('p2', 'dad')
         gfversion = cfg.get('gfVersion', 'gf')
+        flip_chart = cfg.get('flipsides', 'n')
+        flip_chart = flip_chart.lower() == 'y'
     else:
         sm_path = input('Enter the path to the .sm file: ')
         simfile = SMFile(sm_path)
@@ -73,10 +75,12 @@ def main():
         nkeys = simfile.charts[chart_index].n_keys
     
         songname = input_or_default('Enter the name of the song (leave empty to use the SM file song title): ', simfile.header_tags.get('TITLE', 'Simfile-song'))
-        songspeed = input_or_default('Enter the song speed (leave empty for songspeed = 1): ', 1, int)
+        songspeed = input_or_default('Enter the song speed (leave empty for songspeed = 1): ', 1, float)
         p1 = input_or_default('Enter the name of player1 (leave empty for bf): ', 'bf')
         p2 = input_or_default('Enter the name of player2 (leave empty for dad): ', 'dad')
         gfversion = input_or_default('Enter gfVersion (leave empty for \'gf\'): ', 'gf')
+        flip_chart = input_or_default('Flip the chart (dance-single + flip -> bf sings the whole chart) [y/n]? (leave empty for no-flip): ', 'n')
+        flip_chart = flip_chart.lower() == 'y'
     
     print(f'Found SM file:')
     print(simfile)
@@ -93,8 +97,9 @@ def main():
     print(f'{p1 = }')
     print(f'{p2 = }')
     print(f'{gfversion = }')
+    print(f'{flip_chart = }')
 
-    final_filename = replace_bad_chars(songname, ['\\', '/', ':', '*', '?', '\"', '<', '>', '|']).replace(' ', '-')
+    final_filename = replace_bad_chars(songname, ['\\', '/', ':', '*', '?', '\"', '<', '>', '|']).replace(' ', '-').lower()
 
     config = {
         'song': songname,
@@ -103,7 +108,7 @@ def main():
         'player2': p2,
         'gfVersion': gfversion
     }
-    chart = simfile.make_fnf_chart(chart_index, config)
+    chart = simfile.make_fnf_chart(chart_index, config, flip_chart)
 
     with open(f'{final_filename}.json', 'w') as f:
         json.dump(chart, f)

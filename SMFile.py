@@ -37,19 +37,7 @@ class SMFile:
                     if parsing_tag:
                         curr_header_entry += ch
     
-    def __str__(self):
-        selfstr = f'Stepmania Chart File\nFile Name: {self.filename}\nFile Headers:'
-        for tag in self.header_tags:
-            selfstr += f'\n{tag} : {self.header_tags.get(tag)}'
-        
-        bpmstr = ','.join([ f'{x}={y}' for x,y in self.bpms ])
-        if len(bpmstr) > 80:
-            bpmstr = bpmstr[:80] + '...'
-        selfstr += f'\nBPMS: {bpmstr}'
-
-        return selfstr
-    
-    def make_fnf_chart(self, chart_index=0, song_config:dict=None):
+    def make_fnf_chart(self, chart_index=0, song_config:dict=None, flip_chart:bool=False):
         # shoutout to: https://gamebanana.com/tuts/14079 plus a little extra digging around i did
         fnfjson = {
             "song": song_config.get('song', self.header_tags['TITLE']), # take from simfile or ask the user
@@ -67,40 +55,42 @@ class SMFile:
             "validScore": True
         }
 
-        fnf_chart = self.charts[chart_index].to_fnf(self.bpms, self.header_tags.get('OFFSET', 0.0))
+        fnf_chart = self.charts[chart_index].to_fnf(self.bpms, self.header_tags.get('OFFSET', 0.0), flip_chart)
         fnfjson["notes"].extend(fnf_chart)
         return { "song": fnfjson }
+
+    def __str__(self):
+        selfstr = f'Stepmania Chart File\nFile Name: {self.filename}\nFile Headers:'
+        for tag in self.header_tags:
+            selfstr += f'\n{tag} : {self.header_tags.get(tag)}'
+        
+        bpmstr = ','.join([ f'{x}={y}' for x,y in self.bpms ])
+        if len(bpmstr) > 80:
+            bpmstr = bpmstr[:80] + '...'
+        selfstr += f'\nBPMS: {bpmstr}'
+
+        return selfstr
 
 
 class SMChart:
     def __init__(self, chartstr:str):
         # TODO : More robust parsing maybe
         chartstr = chartstr.strip()
-        newchartstr = ''
-        valid = True
-        for ch in chartstr:
-            if ch == '/':
-                valid = False
-            elif ch == '\n':
-                newchartstr += ch
-                valid = True
-            else:
-                if valid:
-                    newchartstr += ch
-        chartstr = newchartstr
-        self.chart_type, self.author, self.difficulty, self.numerical_meter, self.groove_radar_val, note_data = [ x.strip() for x in chartstr.split(':')]
+        chartstr = SMUtils.clean_chart(chartstr)
+        self.chart_type, self.author, self.difficulty, self.numerical_meter, self.groove_radar_val = [ x.strip().split('\n')[-1] for x in chartstr.split(':')[:-1]]
+        note_data = chartstr.split(':')[-1]
         
         self.measures = [ x.strip() for x in note_data.split(',')]
         self.n_keys = len(self.measures[0].strip().split()[0]) # 4 -> one player, 8 -> 2 player
     
-    def to_fnf(self, bpmmap:list[tuple[float]], offset:float=0.0):
+    def to_fnf(self, bpmmap:list[tuple[float]], offset:float=0.0, flip_chart=False):
         sections:list[dict] = []
         holdtracker = {}
         strumtime = 0
         beatnum = 0
         curbpm = SMUtils.bpm_from_map(bpmmap, beatnum) # initial bpm
         change_bpm = False
-        sections.append(SMUtils.make_swagsection(curbpm, change_bpm))
+        sections.append(SMUtils.make_swagsection(curbpm, change_bpm, flip_chart))
         for measure in self.measures:
             measure_rows = measure.strip().split()
 
@@ -129,11 +119,11 @@ class SMChart:
                 nextbpm = SMUtils.bpm_from_map(bpmmap, beatnum)
                 if nextbpm != curbpm:
                     change_bpm = True
-                    sections.append(SMUtils.make_swagsection(nextbpm, change_bpm))
+                    sections.append(SMUtils.make_swagsection(nextbpm, change_bpm, flip_chart))
                 else:
                     change_bpm = False
                     if len(latest_section['sectionNotes']) >= 16:
-                        sections.append(SMUtils.make_swagsection(nextbpm, change_bpm))
+                        sections.append(SMUtils.make_swagsection(nextbpm, change_bpm, flip_chart))
 
                 strumtime += (60/curbpm) * beatsperrow
                 curbpm = nextbpm
